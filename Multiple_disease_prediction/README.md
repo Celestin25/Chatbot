@@ -27,3 +27,4 @@ streamlit run app.py
 
 Note
 Ensure that you have Python installed on your system and that you are using a compatible version. It's recommended to set up a virtual environment for managing dependencies to avoid conflicts with existing packages on your system.
+ 
