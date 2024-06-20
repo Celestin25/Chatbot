@@ -1,6 +1,6 @@
 # BERT-based Chatbot for Mission-Specific Q&A
 
-![Health Assistant](https://your_image_url_here)
+
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -80,5 +80,38 @@ The BERT model was fine-tuned on the dataset using a sequence classification app
 
 ---
 
-## Repository Structure
+
+---
+
+## How to Use
+
+1. Clone the repository:https://github.com/Celestin25/Chatbot
+
+2. Install dependencies:pip install -r requirements.txt
+
+
+4. Access the chatbot interface in your web browser use this link:https://heart-disease-prediction-etzakzma8nvuvsasjvexxj.streamlit.app/
+
+---
+
+## Conclusion
+
+The BERT-based chatbot developed in this project demonstrates advanced capabilities in understanding and responding to mission-specific queries related to health and medical topics. By leveraging BERT's deep learning architecture and fine-tuning techniques, the chatbot provides accurate and contextually relevant information to users in real-time.
+
+---
+
+## Future Improvements
+
+- **Enhanced Training Data:** Continuously update and expand the dataset to improve the chatbot’s knowledge base.
+- **Multilingual Support:** Extend the chatbot’s capabilities to handle queries in multiple languages.
+- **Personalization:** Implement user-specific preferences and context-aware responses to enhance user interaction.
+
+---
+
+## References
+
+- Hugging Face Transformers Documentation: [https://huggingface.co/transformers/](https://huggingface.co/transformers/)
+- Streamlit Documentation: [https://docs.streamlit.io/](https://docs.streamlit.io/)
+- BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding: [https://arxiv.org/abs/1810.04805](https://arxiv.org/abs/1810.04805)
+
 
