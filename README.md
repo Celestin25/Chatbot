@@ -10,11 +10,10 @@
 5. [Performance Metrics](#performance-metrics)
 6. [UI Integration](#ui-integration)
 7. [Demo](#demo)
-8. [Repository Structure](#repository-structure)
-9. [How to Use](#how-to-use)
-10. [Conclusion](#conclusion)
-11. [Future Improvements](#future-improvements)
-12. [References](#references)
+8. [How to Use](#how-to-use)
+9. [Conclusion](#conclusion)
+10. [Future Improvements](#future-improvements)
+11. [References](#references)
 
 ---
 
