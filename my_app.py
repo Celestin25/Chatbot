@@ -4,9 +4,11 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 from streamlit_option_menu import option_menu
-from sklearn.tree import _tree
 from sklearn.preprocessing import LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
+from transformers import BertTokenizer, BertForSequenceClassification
+import torch
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 # Load necessary models and data
 working_dir = os.path.dirname(os.path.abspath(__file__))
@@ -28,10 +30,8 @@ y = labelencoder.fit_transform(Y)
 classifier = DecisionTreeClassifier()
 classifier.fit(X, y)
 
-# Define `cols`
 cols = training_dataset.columns[:-1]  # Assuming all columns except the last one are features
 
-# Helper function for hyperlink
 def create_hyperlink(text, url):
     return f'<a href="{url}" target="_blank">{text}</a>'
 
@@ -115,6 +115,7 @@ elif selected == 'Health Chatbot':
                 st.session_state.current_node = next_node
         else:
             present_disease = print_disease(tree_.value[node])
+
             st.write("You may have: " + str(present_disease))
             red_cols = dimensionality_reduction.columns
             symptoms_given = red_cols[dimensionality_reduction.loc[present_disease].values[0].nonzero()]
