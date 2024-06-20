@@ -25,7 +25,7 @@ This project aims to develop a conversational chatbot using the BERT (Bidirectio
 
 ## Dataset Selection
 
-For this assignment, a custom dataset closely related to the mission of providing health-related information and advice was collected. The dataset includes question-answer pairs sourced from [provide_dataset_link_here](#). These pairs were curated to cover a wide range of health topics such as symptoms, treatments, and preventive measures.
+For this assignment, a custom dataset closely related to the mission of providing health-related information and advice was collected. The dataset includes question-answer pairs sourced and  dataset in the directory is available. These pairs were curated to cover a wide range of health topics such as symptoms, treatments, and preventive measures.
 
 ---
 
