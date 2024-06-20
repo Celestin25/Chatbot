@@ -68,14 +68,15 @@ The BERT model was fine-tuned on the dataset using a sequence classification app
 
 ### Examples of Conversations
 
-1. **User Query:** "What are the symptoms of diabetes?"
-   - **Chatbot Response:** "Common symptoms of diabetes include frequent urination, increased thirst, and unexplained weight loss."
+1. **User Query:** "what is depression?":
+2. 
+   - **Chatbot Response:**  "Depression is a mood disorder that causes persistent feelings of sadness and loss of interest.",
 
-2. **User Query:** "How can I prevent heart disease?"
-   - **Chatbot Response:** "You can prevent heart disease by maintaining a healthy diet, exercising regularly, and avoiding smoking."
+3. **User Query:** "what are the symptoms of anxiety?"
+   - **Chatbot Response:**  "Symptoms of anxiety include feeling nervous, restless, or tense, having an increased heart rate, and sweating.",
 
-3. **User Query:** "What is the treatment for COVID-19?"
-   - **Chatbot Response:** "Treatment for COVID-19 involves supportive care, antiviral medications in some cases, and isolation to prevent spread."
+4. **User Query:**  "how can i manage stress?"
+   - **Chatbot Response:**  "Managing stress can be done through regular physical activity, relaxation techniques like deep breathing, and maintaining a healthy lifestyle.",
 
 ---
 
