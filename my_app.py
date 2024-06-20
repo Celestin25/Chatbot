@@ -6,12 +6,16 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from sklearn.preprocessing import LabelEncoder
 from sklearn.tree import DecisionTreeClassifier
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification, AdamW
 import torch
+from torch.utils.data import DataLoader, TensorDataset, random_split
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from tqdm import tqdm
+
+# Define dataset directory
+working_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Load necessary models and data
-working_dir = os.path.dirname(os.path.abspath(__file__))
 heart_disease_model = pickle.load(open(f'{working_dir}/saved_models/heart_disease_model.sav', 'rb'))
 
 # Load datasets
@@ -32,15 +36,79 @@ classifier.fit(X, y)
 
 cols = training_dataset.columns[:-1]  # Assuming all columns except the last one are features
 
-def create_hyperlink(text, url):
-    return f'<a href="{url}" target="_blank">{text}</a>'
-
-# Mental Health Q&A Data
+# Dataset selection for BERT
 mental_health_data = {
     "What is depression?": "Depression is a mood disorder that causes persistent feelings of sadness and loss of interest.",
     "What are the symptoms of anxiety?": "Symptoms of anxiety include feeling nervous, restless, or tense, having an increased heart rate, and sweating.",
     "How can I manage stress?": "Managing stress can be done through regular physical activity, relaxation techniques like deep breathing, and maintaining a healthy lifestyle.",
 }
+
+# Convert mental health data to dataframe for BERT processing
+mental_health_df = pd.DataFrame(mental_health_data.items(), columns=['Question', 'Answer'])
+
+# Text cleaning and tokenization for BERT
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+def preprocess_data(data, tokenizer, max_length=256):
+    inputs = tokenizer(
+        text=data['Question'].tolist(),
+        text_pair=data['Answer'].tolist(),
+        truncation=True,
+        padding=True,
+        max_length=max_length,
+        return_tensors='pt'
+    )
+    return inputs
+
+inputs = preprocess_data(mental_health_df, tokenizer)
+dataset = TensorDataset(inputs['input_ids'], inputs['attention_mask'], inputs['token_type_ids'])
+
+# Fine-tune the BERT model
+model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
+
+# Create dataloaders
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+train_dataloader = DataLoader(train_dataset, batch_size=8, shuffle=True)
+val_dataloader = DataLoader(val_dataset, batch_size=8)
+
+# Training setup
+optimizer = AdamW(model.parameters(), lr=5e-5)
+
+
+model.train()
+for epoch in range(3):  
+    for batch in tqdm(train_dataloader):
+        optimizer.zero_grad()
+        input_ids, attention_mask, token_type_ids = batch
+        outputs = model(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, labels=labels)
+        loss = outputs.loss
+        loss.backward()
+        optimizer.step()
+
+# Evaluation loop
+model.eval()
+all_preds, all_labels = [], []
+for batch in val_dataloader:
+    input_ids, attention_mask, token_type_ids = batch
+    with torch.no_grad():
+        outputs = model(input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+    logits = outputs.logits
+    preds = torch.argmax(logits, dim=-1).cpu().numpy()
+    all_preds.extend(preds)
+    all_labels.extend(labels.cpu().numpy())
+
+# Performance metrics
+accuracy = accuracy_score(all_labels, all_preds)
+precision = precision_score(all_labels, all_preds, average='weighted')
+recall = recall_score(all_labels, all_preds, average='weighted')
+f1 = f1_score(all_labels, all_preds, average='weighted')
+
+st.write(f"Accuracy: {accuracy}")
+st.write(f"Precision: {precision}")
+st.write(f"Recall: {recall}")
+st.write(f"F1 Score: {f1}")
 
 # Streamlit setup
 st.set_page_config(page_title="Health Assistant", layout="wide", page_icon="🧑‍⚕️")
@@ -109,50 +177,55 @@ elif selected == 'Health Chatbot':
             if st.button('Next', key=f'next_{depth}'):
                 if ans == "yes":
                     st.session_state.symptoms_present.append(name)
-                    next_node = tree_.children_right[node]
+                    recurse(tree_.children_left[node], depth+1)
                 else:
-                    next_node = tree_.children_left[node]
-                st.session_state.current_node = next_node
+                    recurse(tree_.children_right[node], depth+1)
         else:
             present_disease = print_disease(tree_.value[node])
-
-            st.write("You may have: " + str(present_disease))
+            st.write("You may have " + present_disease[0])
             red_cols = dimensionality_reduction.columns
-            symptoms_given = red_cols[dimensionality_reduction.loc[present_disease].values[0].nonzero()]
-            st.write("Symptoms present: " + str(list(st.session_state.symptoms_present)))
+            symptoms_given = red_cols[dimensionality_reduction.loc[present_disease[0]].values[0].nonzero()]
+            st.write("Symptoms present: " + str(st.session_state.symptoms_present))
             st.write("Symptoms given: " + str(list(symptoms_given)))
-            confidence_level = (1.0 * len(st.session_state.symptoms_present)) / len(symptoms_given)
-            st.write("Confidence level is: " + str(confidence_level))
+            confidence_level = (1.0*len(st.session_state.symptoms_present))/len(list(symptoms_given))
+            st.write("Confidence level is " + str(confidence_level))
 
-            # Check if there is a doctor available for the predicted disease
-            if not doc_dataset[doc_dataset['Name'] == present_disease[0]].empty:
-                row = doc_dataset[doc_dataset['Name'] == present_disease[0]]
-                st.write(f'Consult {str(row["Name"].values[0])}')
-                link = str(row['Description'].values[0])
-                st.write(f'Visit {create_hyperlink("this link", link)}')
-            else:
-                st.write("No specific doctor available in the dataset for this disease.")
+            doc_index = [i for i in range(len(disease_desc)) if disease_desc['Disease'][i] == present_disease[0]]
+            doc_list = disease_desc.iloc[doc_index[0]]['Description']
+            st.write(f"Description: {doc_list}")
 
-    def tree_to_code(tree, feature_names):
-        global tree_, feature_name
-        tree_ = tree.tree_
-        feature_name = [feature_names[i] if i != _tree.TREE_UNDEFINED else "undefined!" for i in tree_.feature]
-        return recurse(st.session_state.current_node, 1)
+            doc_names = doc_dataset['Name'].tolist()
+            doc_descs = doc_dataset['Description'].tolist()
+            st.write("Doctors nearby:")
+            for name, desc in zip(doc_names, doc_descs):
+                st.write(f"{name}: {desc}")
 
-    if st.button('Start Chatbot'):
-        st.session_state.current_node = 0
-        st.session_state.symptoms_present = []
-        st.session_state.started = True
-
-    if 'started' in st.session_state:
-        tree_to_code(classifier, cols)
+    tree_ = classifier.tree_
+    feature_name = cols
+    recurse(0, 1)
 
 elif selected == 'Mental Health Q&A':
-    st.title('Mental Health Chatbot')
-    st.write("Ask me anything about mental health!")
+    st.title('Mental Health Q&A Chatbot')
+    st.write("Welcome to the Mental Health Q&A Chatbot. Ask me anything about mental health!")
 
-    query = st.text_input("Your Question:")
+    user_query = st.text_input("Ask your question:")
+    if user_query:
+        inputs = tokenizer([user_query], padding=True, truncation=True, max_length=256, return_tensors='pt')
+        with torch.no_grad():
+            outputs = model(**inputs)
+        response = torch.argmax(outputs.logits, dim=-1).item()
 
-    if query:
-        response = mental_health_data.get(query, "I'm sorry, I don't have an answer to that question. Please consult a professional.")
-        st.write(response)
+        if response == 1:  # Assuming 1 is the label for relevant/positive answers
+            st.write("Based on my knowledge, here's what I can tell you: [RELEVANT_ANSWER]")
+        else:
+            st.write("I'm sorry, I don't have enough information to answer that question.")
+
+# Performance metrics (for display and evaluation)
+def display_metrics(y_true, y_pred, stage="Validation"):
+    st.write(f"### {stage} Metrics")
+    st.write(f"Accuracy: {accuracy_score(y_true, y_pred)}")
+    st.write(f"Precision: {precision_score(y_true, y_pred, average='weighted')}")
+    st.write(f"Recall: {recall_score(y_true, y_pred, average='weighted')}")
+    st.write(f"F1 Score: {f1_score(y_true, y_pred, average='weighted')}")
+
+display_metrics(all_labels, all_preds, stage="Validation")
