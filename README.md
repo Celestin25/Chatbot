@@ -79,6 +79,8 @@ The BERT model was fine-tuned on the dataset using a sequence classification app
    - **Chatbot Response:**  "Managing stress can be done through regular physical activity, relaxation techniques like deep breathing, and maintaining a healthy lifestyle.",
 
 ---
+## Mentalhealth chatbot 
+***Is yes or no answers for diagnosis diseases then chatbot determine the disease you might have!**
 
 
 ---
