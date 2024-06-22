@@ -37,11 +37,24 @@ classifier.fit(X, y)
 cols = training_dataset.columns[:-1]  # Assuming all columns except the last one are features
 
 # Dataset selection for BERT
-mental_health_data = {
-    "What is depression?": "Depression is a mood disorder that causes persistent feelings of sadness and loss of interest.",
-    "What are the symptoms of anxiety?": "Symptoms of anxiety include feeling nervous, restless, or tense, having an increased heart rate, and sweating.",
-    "How can I manage stress?": "Managing stress can be done through regular physical activity, relaxation techniques like deep breathing, and maintaining a healthy lifestyle.",
-}
+intents_file_path = os.path.join(working_dir, 'intents.json')
+try:
+    with open(intents_file_path, 'r') as file:
+        intents_data = json.load(file)
+except FileNotFoundError:
+    st.error("The 'intents.json' file was not found. Please ensure it is placed in the root directory.")
+    st.stop()
+except json.JSONDecodeError:
+    st.error("Error decoding the 'intents.json' file. Please ensure it is in the correct JSON format.")
+    st.stop()
+
+# Function to get chatbot response
+def get_chatbot_response(user_query):
+    for intent in intents_data['intents']:
+        for pattern in intent['patterns']:
+            if pattern.lower() in user_query.lower():
+                return intent['responses'][0]  # Return the first response
+    return "I'm sorry, I don't have an answer to that question. Please consult a professional."
 
 # Convert mental health data to dataframe for BERT processing
 mental_health_df = pd.DataFrame(mental_health_data.items(), columns=['Question', 'Answer'])
