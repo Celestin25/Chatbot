@@ -68,15 +68,15 @@ The BERT model was fine-tuned on the dataset using a sequence classification app
 
 ### Examples of Conversations
 
-1. **User Query:** "what is depression?":
+1. **User Query:** "Good morning!":
 2. 
-   - **Chatbot Response:**  "Depression is a mood disorder that causes persistent feelings of sadness and loss of interest.",
+   - **Chatbot Response:**  "Good morning. I hope you had a good night's sleep. How are you feeling today?",
 
-3. **User Query:** "what are the symptoms of anxiety?"
-   - **Chatbot Response:**  "Symptoms of anxiety include feeling nervous, restless, or tense, having an increased heart rate, and sweating.",
+3. **User Query:** "I am feeling lonely"
+   - **Chatbot Response:**  "I'm sorry to hear that. I'm here for you. Talking about it might help. So, tell me why do you think you're feeling this way?", "I'm here for you. Could you tell me why you're feeling this way?", "Why do you think you feel this way?", "How long have you been feeling this way?",
 
-4. **User Query:**  "how can i manage stress?"
-   - **Chatbot Response:**  "Managing stress can be done through regular physical activity, relaxation techniques like deep breathing, and maintaining a healthy lifestyle.",
+4. **User Query:**  "I am so stressed out", "I am so stressed", "I feel stuck", "I still feel stressed", "I am so burned out""
+   - **Chatbot Response:**  "What do you think is causing this?", "Take a deep breath and gather your thoughts. Go take a walk if possible. Stay hydrated", "Give yourself a break. Go easy on yourself.", "I am sorry to hear that. What is the reason behind this?",
 
 ---
 ## Mentalhealth chatbot 
