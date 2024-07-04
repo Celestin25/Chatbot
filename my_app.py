@@ -30,7 +30,7 @@ classifier = DecisionTreeClassifier()
 classifier.fit(X, y)
 
 # Define `cols`
-cols = training_dataset.columns[:-1]  # Assuming all columns except the last one are features
+cols = training_dataset.columns[:-1] 
 
 # Helper function for hyperlink
 def create_hyperlink(text, url):
@@ -53,7 +53,7 @@ def get_chatbot_response(user_query):
     for intent in intents_data['intents']:
         for pattern in intent['patterns']:
             if re.search(pattern.lower(), user_query.lower()):
-                return intent['responses'][0]  # Return the first response
+                return intent['responses'][0]  
     return "I'm sorry, I don't have an answer to that question. Please consult a professional."
 
 # Streamlit setup
